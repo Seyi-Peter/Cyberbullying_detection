@@ -56,17 +56,20 @@ The app will return:
 
 ❌ "Cyberbullying Detected!" (red)
 
--Future Improvements
+---
+Future Improvements
 Store feedback and votes in a real database (e.g., SQLite or PostgreSQL).
 
----User authentication.
+-User authentication.
 
----Model training from the web interface.
+-Model training from the web interface.
 
----Better UI with Bootstrap or TailwindCSS.
+-Better UI with Bootstrap or TailwindCSS.
 
--License
+---
+License
 This project is open-source and free to use for educational purposes.
 
+---
 👨‍💻 Author
 Oluwaseyi Akinlade- Seyi-Peter
