@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Cyberbullying Detection</title>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+
+    <style>
+      body {
+        background-image: url('{{ url_for('static', filename='/images/image0_0.jpg') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        color: white;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 700px;
+        margin-top: 10%;
+        margin-left: 20%;
+        margin-bottom: 10%;
+        padding: 20px;
+        background-color: #04428e;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      h1 {
+        color: #fff;
+      }
+
+      form {
+        margin-top: 20px;
+      }
+
+      label {
+        font-weight: bold;
+        color: #fff;
+      }
+
+      input[type="text"] {
+        width: calc(100% - 20px);
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+
+      button {
+        background-color: #34a853;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 18px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #2d8c4e;
+      }
+
+      .result {
+        margin-top: 30px;
+      }
+
+      .prediction-text {
+        font-size: 18px;
+        color: #ea4335;
+      }
+
+    .result p {
+        font-size: 18px;
+        color: #4caf50; /* Default color for not detected */
+
+        /* Change color to red if cyberbullying is detected */
+        color: #ff0000;
+    }
+    #loading-spinner {
+       text-align: center;
+       margin-top: 20px;
+    }
+
+    #loading-spinner img {
+       width: 50px; /* Adjust the size of the loading spinner image */
+    }
+
+
+
+    </style>
+</head>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#"
+    >CYBER BULLYING DETECTION USING CNN-GRU APPROACH</a
+    >
+    <button
+            class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+    >
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#about">About The Project</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#detection ">Detection</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<body>
+<!-- About Us Section -->
+<section id="about">
+    <div class="container">
+        <h2 class="section-title" style="color: black">
+            <b>About The Project</b>
+            <br>
+        </h2>
+        <p style="text-align: justify;">
+            This project focuses on using the CNN-GRU model to detect cyberbullying, showcasing an impressive accuracy
+            of up to 95%. Its exceptional accuracy allows for precise identification of harmful online behavior,
+            differentiating it from normal communication effectively. Compared to other models, this approach stands out
+            due to its superior accuracy, ensuring timely intervention to prevent further harm. Moreover, the model's
+            versatility enables it to handle diverse datasets from various online platforms, making it a powerful tool
+            in combating cyberbullying across different formats and communication channels.
+        </p>
+    </div>
+</section>
+
+<section id="detection" class="detection-section">
+    <div class="container">
+        <h1 style="color: black"><b> Cyberbullying Detection</b></h1>
+
+        <br>
+        <!-- Loading text -->
+        <div id="loading-message"
+             style="display: none; text-align: center; margin-top: 20px; color: #fff; font-size: 16px;">
+            Predicting...
+        </div>
+
+        <!-- Form for input -->
+        <form id="prediction-form">
+            <label for="text">Enter text:</label>
+            <input type="text" id="text" name="text" required/>
+            <button type="button" onclick="predict()">Detect</button>
+        </form>
+
+        <!-- Display prediction result -->
+        <div class="result">
+            <h2>Prediction:</h2>
+            <p id="prediction-text" class="prediction-text"></p>
+        </div>
+    </div>
+
+
+    <script>
+      function showLoadingMessage() {
+        document.getElementById('loading-message').style.display = 'block';
+      }
+
+      function hideLoadingMessage() {
+        document.getElementById('loading-message').style.display = 'none';
+      }
+
+      function predict() {
+        showLoadingMessage();
+
+        // Get the input text
+        var text = document.getElementById('text').value;
+
+        // Create a FormData object to send the data
+        var formData = new FormData();
+        formData.append('text', text);
+
+        // Send an AJAX request
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/predict', true);
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4) {
+            hideLoadingMessage();
+
+            if (xhr.status == 200) {
+              // Update the prediction result
+              var result = JSON.parse(xhr.responseText);
+              document.getElementById('prediction-text').style.color = result.color;
+              document.getElementById('prediction-text').innerHTML = result.text;
+
+              // Clear the input text box
+              document.getElementById('text').value = '';
+            } else {
+              // Handle the error (if any)
+              console.error('Error:', xhr.statusText);
+            }
+          }
+        };
+        xhr.send(formData);
+      }
+
+
+    </script>
+
+</section>
+
+<section id="feedback">
+    <div class="container">
+        <h2 class="section-title" style="color: black">
+            <b>User Feedback</b>
+            <br>
+        </h2>
+        <input type="text" id="user-name" name="user-name" placeholder="Enter Your Name" required />
+
+        <!-- Feedback text area -->
+        <div id="feedback-section" style="text-align: center; margin-top: 20px;">
+          <h2>Feedback</h2>
+          <textarea id="feedback-text" rows="4" cols="50" placeholder="Enter your feedback here..."></textarea>
+          <br>
+          <button onclick="submitFeedback()">Submit Feedback</button>
+          <p id="feedback-status" style="color: green; display: none;">Feedback sent successfully!</p>
+        </div>
+    </div>
+    <script>
+      function submitFeedback() {
+        // Get the user name and feedback text
+        var userName = document.getElementById('user-name').value;
+        var feedbackText = document.getElementById('feedback-text').value;
+
+        // Create a FormData object to send the data
+        var formData = new FormData();
+        formData.append('userName', userName);
+        formData.append('feedbackText', feedbackText);
+
+        // Send an AJAX request to save the feedback
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/submit-feedback', true);
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4) {
+            // Hide the loading message
+            hideLoadingMessage();
+
+            if (xhr.status == 200) {
+              // Update the UI to show the feedback status
+              document.getElementById('feedback-status').style.display = 'block';
+
+              // Clear the user name and feedback text areas
+              document.getElementById('user-name').value = '';
+              document.getElementById('feedback-text').value = '';
+            } else {
+              // Handle the error (if any)
+              console.error('Error:', xhr.statusText);
+            }
+          }
+        };
+
+        // Show a loading message (optional)
+        showLoadingMessage();
+
+        xhr.send(formData);
+      }
+    </script>
+    <section id="previous-feedback" style="margin-top: 30px;">
+        <h2>Previous Feedback</h2>
+        <ul id="feedback-list" style="list-style: none; padding: 0;"></ul>
+    </section>
+
+    <script>
+      // Function to fetch and display previous feedback
+      function displayPreviousFeedback() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/get-feedback', true);
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            var feedbackData = JSON.parse(xhr.responseText);
+            renderFeedbackList(feedbackData);
+          }
+        };
+        xhr.send();
+      }
+
+      // Function to render the feedback list
+      function renderFeedbackList(feedbackData) {
+        var feedbackList = document.getElementById('feedback-list');
+        feedbackList.innerHTML = '';
+
+        feedbackData.forEach(function (feedback) {
+          var listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <p>${feedback.userName}: ${feedback.feedbackText}</p>
+            <button onclick="voteFeedback('up', ${feedback.id})">👍</button>
+            <button onclick="voteFeedback('down', ${feedback.id})">👎</button>
+          `;
+          feedbackList.appendChild(listItem);
+        });
+      }
+
+      // Function to handle voting on feedback
+      function voteFeedback(voteType, feedbackId) {
+        // Implement the logic to handle voting (send request to the server, etc.)
+        console.log(`Voted ${voteType} for feedback with ID ${feedbackId}`);
+      }
+
+      // Initial display of previous feedback
+      displayPreviousFeedback();
+
+    </script>
+
+
+</section>
+</body>
+</html>
